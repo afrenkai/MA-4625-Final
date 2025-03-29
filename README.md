@@ -18,10 +18,10 @@ Windows:
 ## Setup Script (fetches the data and splits it into train, test, and split):
 
 POSIX (Mac/Linux):
-`sh setup.py`
+`sh` or `.` `setup.py`
 
 Windows:
-WIP
+`setup.bat`
 
 ## Notes
 Please add your venv to the gitignore if it's not already present. If you don't, when you push to git it will send all the packages in the venv, which is something we don't want. 
