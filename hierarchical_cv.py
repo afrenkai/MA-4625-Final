@@ -4,7 +4,7 @@ from datasets import load_dataset, Dataset, load_from_disk
 
 def split(ds: Dataset, test_size:float=0.2, val_size: float=0.5) -> (Dataset, Dataset, Dataset):
 
-    og_len = len(ds['Run1'])
+    og_len = len(ds['price'])
     print(f' Len of original dataset: {og_len}')
     ds_train, ds_test = ds.train_test_split(test_size=test_size).values()
     ds_test, ds_val = ds_test.train_test_split(test_size=val_size).values()

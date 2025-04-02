@@ -2,3 +2,6 @@ pandas
 scipy
 requests
 datasets
+seaborn
+matplotlib
+tqdm
