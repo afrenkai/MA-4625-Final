@@ -5,3 +5,4 @@ datasets
 seaborn
 matplotlib
 tqdm
+scikit-learn
