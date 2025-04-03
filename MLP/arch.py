@@ -76,13 +76,15 @@ def back_prop(X, y, W: list[np.ndarray], B:list[np.ndarray], alpha, act_fn):
     X_col = x.reshape(-1, 1)
 
     # print(h)
-    dfdyhat = (yhat - y)
     dW = []
     dB = []
     # for k, v in h.items():
     #     print(k)
-  
-    dout = dfdyhat * (h[len(W) -1] > 0) #relu prime
+    if isinstance(yhat, np.ndarray):
+         dfdyhat = (yhat - y).reshape(yhat.shape)
+    else:
+        dfdyhat = np.array([[yhat - y]])
+    dout = dfdyhat    
     n_layers = len(W)
     delta = None
     for i in range(n_layers -1, -1, -1):
