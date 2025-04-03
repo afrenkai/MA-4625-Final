@@ -17,7 +17,7 @@ def split(df: pd.DataFrame, test_size:float=0.2, val_size: float=0.5) -> (pd.Dat
     return df_train, df_val, df_test
 
 def save(df: pd.DataFrame, split: str):
-    df.to_csv(f'diamonds_{split}.csv')
+    df.to_csv(f'diamonds_{split}.csv', index = False)
 
 
 if __name__ == "__main__":
