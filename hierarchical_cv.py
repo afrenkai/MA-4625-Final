@@ -1,30 +1,29 @@
-from consts import DATADIR, NAME, SUBSET
-from datasets import load_dataset, Dataset, load_from_disk
+import pandas as pd
+from sklearn.model_selection import train_test_split
 
+def split(df: pd.DataFrame, test_size:float=0.2, val_size: float=0.5) -> (pd.DataFrame, pd.DataFrame, pd.DataFrame):
 
-def split(ds: Dataset, test_size:float=0.2, val_size: float=0.5) -> (Dataset, Dataset, Dataset):
-
-    og_len = len(ds['price'])
+    og_len = len(df)
     print(f' Len of original dataset: {og_len}')
-    ds_train, ds_test = ds.train_test_split(test_size=test_size).values()
-    ds_test, ds_val = ds_test.train_test_split(test_size=val_size).values()
-
-    assert len(ds_train) == 0.8 * og_len
-    assert len(ds_val) == 0.1 * og_len
-    assert len(ds_test) == 0.1 * og_len
+    df_train, df_test = train_test_split(df, test_size = test_size, random_state = 67)
+    df_val, df_test = train_test_split(df_test, test_size = val_size, random_state = 67)
+    
+    assert len(df_train) == 0.8 * og_len
+    assert len(df_val) == 0.1 * og_len
+    assert len(df_test) == 0.1 * og_len
 
     print('split works')
 
-    return ds_train, ds_val, ds_test
+    return df_train, df_val, df_test
 
-def save(ds: Dataset, dir, name, subset, split):
-    ds.save_to_disk(f'{dir}/{name}-{subset}-{split}')
+def save(df: pd.DataFrame, split: str):
+    df.to_csv(f'diamonds_{split}.csv')
 
 
 if __name__ == "__main__":
-    ds = load_from_disk(f'{DATADIR}/{NAME}-{SUBSET}')
+    df = pd.read_csv('diamonds.csv')
+    train_df, val_df, test_df = split(df)
+    save(train_df, 'train')
+    save(val_df, 'val')
+    save(test_df, 'test')
 
-    train_ds, val_ds, test_ds = split(ds)
-    save(train_ds, DATADIR, NAME, SUBSET, 'train')
-    save(val_ds, DATADIR, NAME, SUBSET, 'val')
-    save(test_ds, DATADIR, NAME, SUBSET, 'test')
