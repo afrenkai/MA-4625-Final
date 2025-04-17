@@ -12,6 +12,7 @@ def tanh(z: np.ndarray | int | float):
     return res
 
 def half_mse(yhat, y, W: list[np.ndarray], alpha):
+    yhat = yhat.reshape(-1, 1)
     loss = 0.5 * np.mean((y-yhat) ** 2)
     reg = (alpha/2)
     reg_param = 0
@@ -25,10 +26,12 @@ def forward_prop(x, y, W: list[np.ndarray], b: list[np.ndarray], alpha, act_fn):
         print('unequal amount of weights and biases')
         return None
     b_0 = b[0]
-    x_col = x.reshape(-1, 1)
+    x_col = x.T
+    print(f'x col shape: {x_col.shape}')
+    print(f'w[0] shape: {W[0].shape}')
     z = {}
     h = {}
-    z[0] = W[0] @ x_col + b_0.reshape(-1, 1)
+    z[0] = W[0] @ x_col + b_0[:, np.newaxis]
     h[0] = act_fn(z[0])
 
 
@@ -37,9 +40,9 @@ def forward_prop(x, y, W: list[np.ndarray], b: list[np.ndarray], alpha, act_fn):
     
     if len(W) >  2:
         for w in range(1 , len(W)):
-            # print(f' Weight at index {w}: {W[w].shape}')
-            # print(f'score at index {w}: {h[w-1].shape}')
-            # print(f'bias at index {w}: {b[w].shape}')
+            print(f' Weight at index {w}: {W[w].shape}')
+            print(f'score at index {w}: {h[w-1].shape}')
+            print(f'bias at index {w}: {b[w].shape}')
             z[w] = W[w] @ z[w-1] + b[w][:, np.newaxis]
             if w < len(W) - 1 or act_fn == sigmoid:
 
@@ -58,7 +61,9 @@ def forward_prop(x, y, W: list[np.ndarray], b: list[np.ndarray], alpha, act_fn):
     elif len(W) == 2:
         print(z[0])
         print(h[0])
+        
         y_hat = W[1] @ h[1] + b[1]
+        print(y_hat)
         loss = half_mse(y_hat, y, W, alpha)
     elif len(W)== 1:
         y_hat = z[0]
@@ -67,23 +72,20 @@ def forward_prop(x, y, W: list[np.ndarray], b: list[np.ndarray], alpha, act_fn):
 
 def back_prop(X, y, W: list[np.ndarray], B:list[np.ndarray], alpha, act_fn):
     
-    # print(f' fwd prop: {forward_prop(X, y, W, B, alpha, act_fn)}')
+    print(f' fwd prop: {forward_prop(X, y, W, B, alpha, act_fn)}')
     loss, z, h, x, yhat = forward_prop(X, y, W, B, alpha, act_fn)
     print(f' loss from fprop: {loss}')
     print(f' h from fprop: {h}')
     print(f' pred from fprop: {yhat}')
 
     X_col = x.reshape(-1, 1)
-
+    yhat = yhat.reshape(-1, 1)
     # print(h)
     dW = []
     dB = []
     # for k, v in h.items():
     #     print(k)
-    if isinstance(yhat, np.ndarray):
-         dfdyhat = (yhat - y).reshape(yhat.shape)
-    else:
-        dfdyhat = np.array([[yhat - y]])
+    dfdyhat = (y - yhat)
     dout = dfdyhat    
     n_layers = len(W)
     delta = None
@@ -101,6 +103,7 @@ def back_prop(X, y, W: list[np.ndarray], B:list[np.ndarray], alpha, act_fn):
                 print('wrong act fn')
                 return None
         if i > 0:
+            print(delta)
             dW_i = delta @ h[i-1].T
         else:
             dW_i = delta@X_col.T
